@@ -7,6 +7,8 @@ Manage GitLab merge requests from Neovim by shelling out to the
 [`glab`](https://gitlab.com/gitlab-org/cli) CLI, with diffs rendered by
 [codediff.nvim](https://github.com/esmuellert/codediff.nvim).
 
+![Demo: viewing an MR, opening its diff, and reading a discussion thread](assets/demo.gif)
+
 This plugin does not implement its own diff fetching or rendering — it
 delegates entirely to codediff.nvim's `:CodeDiff pr {number}`, which already
 fetches GitHub/GitLab/Azure DevOps PRs/MRs using your git remote's existing
