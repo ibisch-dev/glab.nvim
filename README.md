@@ -30,19 +30,6 @@ Run `:checkhealth glab` after installing to verify all three.
 }
 ```
 
-For local development, point `dir` at your working copy instead of a repo
-spec:
-
-```lua
-{
-  "ibisch-dev/glab.nvim",
-  dir = "~/Development/glab.nvim",
-  dependencies = { "esmuellert/codediff.nvim" },
-  cmd = "Glab",
-  opts = {},
-}
-```
-
 ## Usage
 
 All functionality is exposed through a single `:Glab` command, mirroring
