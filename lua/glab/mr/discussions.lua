@@ -290,13 +290,17 @@ function M._open_float(discussion, iid)
       if not text or text == "" then
         return
       end
-      require("glab.cli").run({ "mr", "note", "create", iid, "-m", text, "--reply", tostring(discussion.id) }, {}, function(ok, out)
-        require("glab.util").notify_result(ok, out, "reply")
-        if ok then
-          M.refresh(iid)
-          pcall(vim.api.nvim_win_close, win, true)
+      require("glab.cli").run(
+        { "mr", "note", "create", iid, "-m", text, "--reply", tostring(discussion.id) },
+        {},
+        function(ok, out)
+          require("glab.util").notify_result(ok, out, "reply")
+          if ok then
+            M.refresh(iid)
+            pcall(vim.api.nvim_win_close, win, true)
+          end
         end
-      end)
+      )
     end)
   end, opts)
 
