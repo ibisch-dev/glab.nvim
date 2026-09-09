@@ -1,5 +1,8 @@
 # glab.nvim
 
+[![stylua](https://github.com/ibisch-dev/glab.nvim/actions/workflows/stylua.yml/badge.svg)](https://github.com/ibisch-dev/glab.nvim/actions/workflows/stylua.yml)
+[![luacheck](https://github.com/ibisch-dev/glab.nvim/actions/workflows/luacheck.yml/badge.svg)](https://github.com/ibisch-dev/glab.nvim/actions/workflows/luacheck.yml)
+
 Manage GitLab merge requests from Neovim by shelling out to the
 [`glab`](https://gitlab.com/gitlab-org/cli) CLI, with diffs rendered by
 [codediff.nvim](https://github.com/esmuellert/codediff.nvim).
