@@ -1,0 +1,109 @@
+*glab.txt*    Manage GitLab merge requests with glab + codediff.nvim
+
+==============================================================================
+CONTENTS                                                        *glab-contents*
+
+    1. Introduction .......... |glab-introduction|
+    2. Requirements ........... |glab-requirements|
+    3. Setup ................... |glab-setup|
+    4. Commands ................ |glab-commands|
+    5. Keymaps ................. |glab-keymaps|
+
+==============================================================================
+1. Introduction                                             *glab-introduction*
+
+glab.nvim manages GitLab merge requests from Neovim by shelling out to the
+`glab` CLI. Diff rendering is delegated entirely to codediff.nvim's
+`:CodeDiff pr {number}`, which already fetches PRs/MRs from GitHub, GitLab,
+and Azure DevOps using your git remote's existing auth.
+
+==============================================================================
+2. Requirements                                             *glab-requirements*
+
+- Neovim >= 0.10
+- `glab`, authenticated (`glab auth login`)
+- codediff.nvim (https://github.com/esmuellert/codediff.nvim)
+
+Run `:checkhealth glab` to verify.
+
+==============================================================================
+3. Setup                                                           *glab-setup*
+                                                                  *glab.setup()*
+
+>lua
+    require("glab").setup({
+      glab_cmd = "glab",
+      diff = { codediff_extra_args = {} },
+      discussions = {
+        sign_text = "▌",
+        sign_hl = "DiagnosticSignInfo",
+        resolved_sign_hl = "DiagnosticSignOk",
+        virtual_text = true,
+      },
+      keymaps = {
+        view = { diff = "gd", approve = "ga", merge = "gM", checkout = "gco",
+                 open_browser = "gx", refresh = "gr", close = "q" },
+        discussion = { toggle_thread = "gt", new_thread = "gn", reply = "r",
+                       resolve = "R", next_thread = "]t", prev_thread = "[t" },
+      },
+    })
+<
+
+`setup()` is optional — every default works without calling it.
+
+==============================================================================
+4. Commands                                                     *glab-commands*
+
+                                                                        *:Glab*
+:Glab mr list [flags]      Pick a merge request (flags passed through to
+                           `glab mr list`, e.g. `-a me`, `--label bug`).
+
+:Glab mr view [iid]        Open a buffer with the MR's description, comments,
+                           and activity.
+
+:Glab mr diff [iid]        Open the MR's diff via codediff.nvim, with
+                           discussion threads overlaid.
+
+:Glab mr approve [iid]     Approve the MR.
+
+:Glab mr merge [iid]       Merge the MR (confirms first).
+
+:Glab mr checkout [iid]    Check out the MR's branch locally.
+
+:Glab mr close [iid]       Close the MR.
+
+:Glab mr reopen [iid]      Reopen the MR.
+
+:Glab mr note list [iid]   Browse discussion threads independent of any open
+                           diff view.
+
+`iid` is optional everywhere; omitting it resolves to the current branch's
+merge request.
+
+==============================================================================
+5. Keymaps                                                       *glab-keymaps*
+
+MR view buffer (opened by `:Glab mr list` / `:Glab mr view`):
+
+    gd   open diff
+    ga   approve
+    gM   merge
+    gco  checkout
+    gx   open in browser
+    gr   refresh
+    q    close
+
+Diff buffers with discussion marks:
+
+    gt   show thread on current line
+    gn   start a new thread on current line
+    ]t   jump to next thread
+    [t   jump to previous thread
+
+Thread floating window:
+
+    r    reply
+    R    resolve / reopen
+    q    close
+
+ vim:tw=78:ts=8:noet:ft=help:norl:
