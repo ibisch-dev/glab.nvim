@@ -52,6 +52,27 @@ local function is_resolved(discussion)
   return n ~= nil and n.resolved == true
 end
 
+--- Edit/delete act on one specific note, but a thread can have several. Pick
+--- the only one silently, or ask when there's more than one.
+local function pick_note(discussion, callback)
+  local notes = discussion.notes or {}
+  if #notes == 0 then
+    vim.notify("No notes in this discussion", vim.log.levels.WARN)
+    return
+  end
+  if #notes == 1 then
+    callback(notes[1])
+    return
+  end
+  vim.ui.select(notes, {
+    prompt = "Select note",
+    format_item = function(n)
+      local author = n.author and (n.author.username or n.author.name) or "?"
+      return string.format("%s: %s", author, (n.body or ""):sub(1, 60))
+    end,
+  }, callback)
+end
+
 --- Fetch all diff-positioned discussions for `iid` and index them by path/line.
 function M.fetch(iid, callback)
   require("glab.cli").run_json({ "mr", "note", "list", iid, "-t", "diff" }, {}, function(ok, discussions)
@@ -258,7 +279,7 @@ local function render_thread_lines(discussion)
     table.insert(lines, "")
   end
   table.insert(lines, "---")
-  table.insert(lines, "[r]eply  [R]esolve/reopen  [q]uit")
+  table.insert(lines, "[r]eply  [R]esolve/reopen  [e]dit  [d]elete  [q]uit")
   return lines
 end
 
@@ -315,6 +336,52 @@ function M._open_float(discussion, iid)
     end)
   end, opts)
 
+  vim.keymap.set("n", cfg.edit, function()
+    pick_note(discussion, function(note)
+      if not note then
+        return
+      end
+      vim.ui.input({ prompt = "Edit comment: ", default = note.body }, function(text)
+        if not text or text == "" then
+          return
+        end
+        -- `glab mr note update <mr-id> <note-id> -m ...` -- note-id is the
+        -- second positional despite the CLI's own --help USAGE line implying
+        -- the opposite order; verified empirically against a real MR before
+        -- wiring this up (the --help examples, not its USAGE line, are correct).
+        require("glab.cli").run({ "mr", "note", "update", iid, tostring(note.id), "-m", text }, {}, function(ok, out)
+          require("glab.util").notify_result(ok, out, "edit comment")
+          if ok then
+            M.refresh(iid)
+            pcall(vim.api.nvim_win_close, win, true)
+          end
+        end)
+      end)
+    end)
+  end, opts)
+
+  vim.keymap.set("n", cfg.delete, function()
+    pick_note(discussion, function(note)
+      if not note then
+        return
+      end
+      vim.ui.select({ "Yes", "No" }, {
+        prompt = "Permanently delete this comment?",
+      }, function(choice)
+        if choice ~= "Yes" then
+          return
+        end
+        require("glab.cli").run({ "mr", "note", "delete", iid, tostring(note.id), "--yes" }, {}, function(ok, out)
+          require("glab.util").notify_result(ok, out, "delete comment")
+          if ok then
+            M.refresh(iid)
+            pcall(vim.api.nvim_win_close, win, true)
+          end
+        end)
+      end)
+    end)
+  end, opts)
+
   vim.keymap.set("n", "q", function()
     pcall(vim.api.nvim_win_close, win, true)
   end, opts)
@@ -367,6 +434,18 @@ end
 function M.reopen_passthrough(args)
   require("glab.cli").run(vim.list_extend({ "mr", "note", "reopen" }, args), {}, function(ok, out)
     require("glab.util").notify_result(ok, out, "mr note reopen")
+  end)
+end
+
+function M.update_passthrough(args)
+  require("glab.cli").run(vim.list_extend({ "mr", "note", "update" }, args), {}, function(ok, out)
+    require("glab.util").notify_result(ok, out, "mr note update")
+  end)
+end
+
+function M.delete_passthrough(args)
+  require("glab.cli").run(vim.list_extend({ "mr", "note", "delete" }, args), {}, function(ok, out)
+    require("glab.util").notify_result(ok, out, "mr note delete")
   end)
 end
 

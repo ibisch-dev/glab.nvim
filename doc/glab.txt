@@ -44,7 +44,8 @@ Run `:checkhealth glab` to verify.
         view = { diff = "gd", approve = "ga", merge = "gM", checkout = "gco",
                  open_browser = "gx", refresh = "gr", close = "q" },
         discussion = { toggle_thread = "gt", new_thread = "gn", reply = "r",
-                       resolve = "R", next_thread = "]t", prev_thread = "[t" },
+                       resolve = "R", edit = "e", delete = "d",
+                       next_thread = "]t", prev_thread = "[t" },
       },
     })
 <
@@ -77,8 +78,14 @@ Run `:checkhealth glab` to verify.
 :Glab mr note list [iid]   Browse discussion threads independent of any open
                            diff view.
 
-`iid` is optional everywhere; omitting it resolves to the current branch's
-merge request.
+:Glab mr note update <iid> <note-id> -m <text>
+                           Edit a note's body.
+
+:Glab mr note delete <iid> <note-id>
+                           Permanently delete a note.
+
+`iid` is optional everywhere except `note update`/`note delete`; omitting it
+elsewhere resolves to the current branch's merge request.
 
 ==============================================================================
 5. Keymaps                                                       *glab-keymaps*
@@ -104,6 +111,8 @@ Thread floating window:
 
     r    reply
     R    resolve / reopen
+    e    edit a note (prompts if the thread has more than one)
+    d    delete a note, after confirming (permanent)
     q    close
 
  vim:tw=78:ts=8:noet:ft=help:norl:

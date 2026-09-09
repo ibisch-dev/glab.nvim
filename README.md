@@ -48,6 +48,8 @@ All functionality is exposed through a single `:Glab` command, mirroring
 | `:Glab mr checkout [iid]` | Check out the MR's branch locally |
 | `:Glab mr close [iid]` / `:Glab mr reopen [iid]` | Close / reopen the MR |
 | `:Glab mr note list [iid]` | Browse discussion threads (works even without an open diff) |
+| `:Glab mr note update <iid> <note-id> -m <text>` | Edit a note's body |
+| `:Glab mr note delete <iid> <note-id>` | Permanently delete a note |
 
 `iid` is optional everywhere — omitting it resolves to the current branch's
 merge request, same as bare `glab mr view`/`glab mr diff` on the CLI.
@@ -84,6 +86,8 @@ Inside a thread's floating window:
 |---|---|
 | `r` | Reply |
 | `R` | Resolve / reopen |
+| `e` | Edit a note (prompts if the thread has more than one) |
+| `d` | Delete a note, after confirming (permanent — cannot be undone) |
 | `q` | Close |
 
 > The mapping from GitLab's file+line positions onto codediff.nvim's diff

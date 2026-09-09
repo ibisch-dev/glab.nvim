@@ -27,6 +27,8 @@ local defaults = {
       new_thread = "gn",
       reply = "r",
       resolve = "R",
+      edit = "e",
+      delete = "d",
       next_thread = "]t",
       prev_thread = "[t",
     },

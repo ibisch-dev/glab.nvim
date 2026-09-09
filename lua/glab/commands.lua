@@ -39,6 +39,12 @@ local subcommands = {
       reopen = function(args)
         require("glab.mr.discussions").reopen_passthrough(args)
       end,
+      update = function(args)
+        require("glab.mr.discussions").update_passthrough(args)
+      end,
+      delete = function(args)
+        require("glab.mr.discussions").delete_passthrough(args)
+      end,
     },
   },
 }
